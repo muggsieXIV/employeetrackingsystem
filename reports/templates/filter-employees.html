@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>ETS | {{ company.name }} Admins</title>
+        {% load static %}
+
+        <!-- Favicons -->
+        <link href="{% static '/img/ets-favicon.png' %}" rel="icon">
+
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <Link rel="stylesheet" href="{% static 'css/style.css' %}" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    </head>
+    <body>
+        <!-- 
+        ==================
+        NAVIGATION SECTION
+        ================== 
+        -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark" id="navbar">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                <div class="navbar-nav">
+                    <a class="navbar-brand" href="#">{{ company.name }}</a>
+                    <a class="nav-item nav-link active" href="/manage/admin">Management <span class="sr-only">(current)</span></a>
+                    <a class="nav-item nav-link" href="/clock">Clock</a>
+                    <a class="nav-item nav-link" href="/settings">Settings</a>
+                    <a class="nav-item nav-link" href="/logout">Logout</a>
+                </div>
+            </div>
+        </nav>
+        <br>
+        <!-- 
+        ======================
+        END NAVIGATION SECTION
+        ====================== 
+        -->
+
+        <!-- 
+        ==================
+        ADMIN NAVIGATION
+        ================== 
+        -->
+        <div class="row mt-50 ml-3">
+            <!-- TAB LINKS -->
+            <section class="admin-control col-sm-3 col-lg-2 tab">
+                <div class="container">
+                    <img src="{{ company.image.url }}" alt="{{ company.name }}" />
+                </div>
+                <header>
+                    <h6>Admin</h6>
+                </header>
+                <div>
+                    <a href="/manage/admin">Admins</a>
+                </div>
+                <hr>
+                <br>
+                <header>
+                    <h6>Company</h6>
+                </header>
+                    <div><a href="/manage/company">Company<a></div>
+                    <hr>
+                    <div><a href="/manage/locations">Locations</a></div>
+                    <hr>
+                    <div><a href="/manage/employees">Employees</a></div>
+                <br>
+                <header>
+                    <h6>Reports</h6>
+                </header>
+                {% if locations %}
+                    {% for l in locations %}
+                        <div><a href="/reports/locations/{{l.id}}" > {{ l.name }} </a></div>
+                        <hr>
+                    {% endfor %}
+                {% endif %}
+                <div><a href="/reports/all-employees">Employee Reports</a></div>
+                <br>
+                <hr>
+                <br>
+                <div class="support-comment">
+                    <p>For issues please contact <a href="mailto:benwillwalk@gmail.com" class="">Customer Support</a> with a detailed summery of the issue.</p>
+                </div>
+            </section>
+            <!-- 
+            ====================
+            END ADMIN NAVIGATION
+            ====================
+            -->
+            <section class="col-sm-9 col-lg-9 text-center">
+                <div class="row">
+                    <div class="col-sm-2 col-lg-2"></div>
+                    <div class="col-sm-8 col-lg-8">
+                        <h3>{{ company.name }} | Employee Reports</h3>
+                        <hr>
+                        <div class="text-center">
+                            <p>Generate report for all employees for date range: </p>
+                            <form class="form-control" action="/reports/all-employees/process" method="POST">
+                                {% csrf_token %}
+                                <label for="start_date">Start Date:</label>
+                                <input type="date" name="start_date" />
+                                <label for="end_date">End Date:</label>
+                                <input type="date" name="end_date" />
+                                <input type="submit" class="btn btn-success" />
+                            </form>
+                        <div>
+                        <br>
+                        <hr>
+                        <p>All Employees</p>
+                        <br>
+                        <div class="data-container">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col"></th>
+                                        <th scope="col">Last Name</th>
+                                        <th scope="col">First Name</th>
+                                        <th scope="col">Is Active</th>
+                                        <th scope="col">Company</th>
+                                        <th scope="col">Created At</th>
+                                        <th scope="col">Updated At</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for employee in all_employees %}
+                                        <tr>
+                                            <th scope="row"><a href="/reports/employees/{{ employee.id }}">View</a></th>
+                                            <td class="table-data">{{ employee.last_name }}</td>
+                                            <td class="table-data">{{ employee.first_name }}</td>
+                                            <td class="table-data">
+                                                {% if employee.is_active == True %}
+                                                    <i class="bi bi-check-circle-fill"></i>
+                                                {% endif %}
+                                                {% if employee.is_active != True %}
+                                                    <i class="bi bi-x-circle-fill"></i>
+                                                {% endif %}
+                                            </td>
+                                            <td class="table-data">{{ employee.company }}</td>
+                                            <td class="table-data">{{ employee.created_at }}</td>
+                                            <td class="table-data">{{ employee.updated_at }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <br>
+                    <div>
+                    <div class="col-sm-2 col-lg-2"></div>
+                </div>
+            </section>
+        </div>
+
+
+
+        <!-- Latest compiled and minified JavaScript -->
+        <script src="http://cdn.date-fns.org/v1.9.0/date_fns.min.js"></script>
+        <script src="{% static 'js/app.js' %}"></script>
+        <script src="{% static 'js/script.js' %}"></script>
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    </body>
+</html>
+
+

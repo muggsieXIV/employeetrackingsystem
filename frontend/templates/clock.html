@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{{ company.name }} | Employee Dashboard</title>
+    {% load static %}
+    <!-- Favicons -->
+        <link href="{% static '/img/ets-favicon.png' %}" rel="icon">
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <Link rel="stylesheet" href="{% static 'css/style.css' %}" />
+    <script> 
+        $(document).ready(function(){
+            setInterval(function(){
+                $("#msgblock").load(window.location.href + " #msgblock" );
+            }, 1000);
+        });
+    </script>
+</head>
+<body>
+    <div class="clock-page">
+        <!-- 
+        ==================
+        NAVIGATION SECTION
+        ================== 
+        -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                <div class="navbar-nav">
+                    <a class="navbar-brand" href="/dashboard">{{ company.name }} | {{ location.name }}</a>
+                    <a class="nav-item nav-link" href="/logout">Logout</a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 
+        ====================
+        CLOCK SYSTEM SECTION
+        ====================
+        -->
+        <div class="container text-center">
+            <div class="pt-5">
+                <!-- logo section-->
+                <img src="{{ company.image.url }}" class="" alt="{{ company.name }}" />
+            </div>
+            <br></br>
+            <section class="clock-in-out-system">
+                <!-- clock -->
+                <div class="clock"></div>
+                <!-- employee form -->
+                <div class="employee-form">
+                    <form method="POST" action="/process-clock">
+                        {% csrf_token %}
+                        <label for="employee">Employee</label>
+                        <select class="form-control" name="employee">
+                            <option disabled selected>- Select -</option>
+                            {% for employee in all_employees %}
+                                <option value="{{employee.id}}">{{employee.last_name}}, {{employee.first_name}}</option>
+                            {% endfor %}
+                        </select>
+                        <br>
+                        
+                        <label for="comment">Comment</label>
+                        <textarea class="form-control" name="comment" value="comment"></textarea>
+                        <div class="row">
+                            <button class="btn btn-success" type="submit" value="clockin" name="clocksys">Clock In</button>
+                            <button class="btn btn-danger" type="submit" value="clockout" name="clocksys">Clock Out</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+            <br></br>
+            <!-- error messages -->
+            {% if messages %}
+                <div class="container error-msg-block text-center" id="message-block">
+                    <div class="container pl-5 mt-5 text-center">
+                        <div class="container text-center">
+                            {% for message in messages %}
+                                <h4 class="text-center">{{ message }}</h4><br>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            <div>
+                <h5>If you have issues TEXT Amy Walker</h5>
+                <h5><a href="" class="">952-210-0831</h5>
+            </div>
+            
+        </div>
+        <br>
+        
+        
+    </div>
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="http://cdn.date-fns.org/v1.9.0/date_fns.min.js"></script>
+    <script src="{% static 'js/app.js' %}"></script>
+    <script src="{% static 'js/script.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</body>
+</html>

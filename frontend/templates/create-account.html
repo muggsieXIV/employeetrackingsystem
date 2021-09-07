@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>ETS - Create Account</title>
+    {% load static %}
+    <!-- Favicons -->
+        <link href="{% static '/img/ets-favicon.png' %}" rel="icon">
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <Link rel="stylesheet" href="{% static 'css/style.css' %}" />
+</head>
+<body>
+    <a href="/signin-company-admin" class="btn btn-secondary m-2">Sign In</a>
+    <div class="sign-in-page text-center m-5">
+        <img src="{% static 'img/ets-logo.png' %}" class="mb-3" />
+        <h3 class="mt-3">Create New Account</h3>
+        <div class="row">
+            <div class="col-sm-2 col-lg-1"></div>
+            <div class="col-sm-4 col-lg-5">
+                <form class="employee-form text-center m-5" method="POST" action="/create-account/process">
+                    {% csrf_token %}
+                    <label for="first_name">Company Name: </label>
+                    <input class="form-control" type="text" name="name" placeholder="Company Name" />
+                    <br>
+                    <label for="image">Company Logo: </label>
+                    <input type="file" name="image" />
+                    <input type="submit" class="btn btn-success mt-4" />
+                </form>
+            </div>
+            <div class="col-sm-6 col-md-6 col-lg-5">
+                <div class="col-sm-12 col-lg-12">
+                    <div class="container pl-5 mt-5 p-10 text-center">
+                        <h4>Account Creation Steps: </h4>
+                        <div class="text-center">
+                            <div class="align-center">
+                                <ul class="text-left account-steps">
+                                    <li><p class="mark"></p> Create Company</li>
+                                    <li><p class="mark"></p> Create Admin</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <br>
+                        <p>For issues please contact <a href="mailto:benwillwalk@gmail.com" class="">Customer Support</a> with a detailed summery of the issue.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container error-msg-block">
+            <div class="container pl-5 mt-5">
+                <div class="container text-left">
+                    {% if messages %}
+                        <h3>Error(s):</h3>
+                        {% for message in messages %}
+                            <h4>{{ message }}</h4><br>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="http://cdn.date-fns.org/v1.9.0/date_fns.min.js"></script>
+    <script src="{% static 'js/app.js' %}"></script>
+    <script src="{% static 'js/script.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</body>
+</html>
