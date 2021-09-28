@@ -94,38 +94,6 @@ def process_create_account_admin(request):
     return redirect('/signin-company-admin')
 
 
-
-    context = {
-        'company': Company.objects.get(id=request.session['company_id']),
-        'admin': Admin.objects.get(id=request.session['admin_id']),
-        'location': Location.objects.get(id=request.session['location']),
-        'employees': [],
-        'total_employees': 0,
-        'company_name': "",
-        'admin_name': "",
-        'location_name': "",
-    }
-
-    company = context['company']
-
-    context['company_name'] = company.name
-    context['admin_name'] = context['admin'].last_name + ', ' + context['admin'].first_name
-    context['location_name'] = context['location'].name
-
-    print(context['company_name'])
-    print(context['admin_name'])
-    print(context['location'])
-
-    company_employees = company.employee
-
-    context['employees'] = company_employees
-
-    print(context['employees'])
-
-    print(Employee.objects.all())
-
-    return render(request, "create-account-review.html", context)
-
 # ========
 # Sign In
 # ========
@@ -360,9 +328,9 @@ def signout_location(request):
     request.session.flush()
     return redirect('/')
 
-# ===========
-# ADMIN VIEWS
-# ===========
+# =========================
+# ADMIN VIEWS and FUNCTIONS
+# =========================
 
 # Manage Admin View
 def manage_admin(request):
@@ -488,6 +456,9 @@ def process_admin_delete(request, admin_id):
     admin_to_delete.delete()
     return redirect('/manage/admin')
 
+# ===========================
+# COMPANY VIEWS and FUNCTIONS
+# ===========================
 # Edit Company Forum View
 def manage_company(request):
     if 'admin_id' not in request.session:
@@ -514,14 +485,29 @@ def process_edit_company(request):
     if len(errors) > 0:
         for message in errors.values():
             messages.error(request, message)
-        return redirect('/create-account/admin/locations')
+        return redirect('/manage/company')
 
-    company.name = request.POST['name']
-    company.image = request.POST['image']
+    if not request.POST['image'] and not request.POST['name']:
+        return redirect('/manage/company')
 
-    company.save()
+    if not request.POST['name']:
+        company.name = company.name
+        company.image = request.POST['image']
+        company.save()
+        return redirect('/manage/company')
 
-    return redirect('/manage/company')
+    if not request.POST['image']:
+        company.name = request.POST['name']
+        company.image = company.image
+        company.save()
+        return redirect('/manage/company')
+
+    if request.POST['name'] and request.POST['image']:
+        company.name = request.POST['name']
+        company.image = request.POST['image']
+        company.save()
+        return redirect('/manage/company')
+
 
 # Delete Company Process
 def process_company_delete(request):
@@ -533,6 +519,9 @@ def process_company_delete(request):
     request.session.flush()
     return redirect('/signin-company-admin')
 
+# ============================
+# LOCATION VIEWS and FUNCTIONS
+# ============================
 # Manage Locations View
 def manage_locations(request):
     if 'admin_id' not in request.session:
@@ -707,7 +696,7 @@ def manage_edit_employees(request, employee_id):
 
     context = {
         'company': company,
-        'employee': Employee.objects.filter(company=company.id),
+        'employee': Employee.objects.get(id=employee_id),
         'locations': Location.objects.filter(company=company.id)
     }
 
@@ -746,7 +735,16 @@ def admin_clock_view(request):
 
 # Admin Settings
 def settings(request):
-    pass
+    if 'admin_id' not in request.session:
+        return redirect('/signin-company-admin')
+    
+    company = Company.objects.get(admins=request.session['admin_id'])
+
+    context = {
+        'company': company, 
+        'locations': Location.objects.filter(company=company.id)
+    }
+    return render(request, 'settings.html', context)
 
 # =======
 # Logout

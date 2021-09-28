@@ -27,7 +27,6 @@
                 <div class="navbar-nav">
                     <a class="navbar-brand" href="#">{{ company.name }}</a>
                     <a class="nav-item nav-link active" href="/manage/admin">Management <span class="sr-only">(current)</span></a>
-                    <a class="nav-item nav-link" href="/clock">Clock</a>
                     <a class="nav-item nav-link" href="/settings">Settings</a>
                     <a class="nav-item nav-link" href="/logout">Logout</a>
                 </div>
@@ -96,6 +95,12 @@
                     <div class="text-center">
                         <div class="company-editting-block">
                             <h3>Edit Employee<h3>
+                            <hr>
+                            <div class="container">
+                                <h5>First Name: {{employee.first_name}}</h5>
+                                <h5>Last Name: {{employee.last_name}}</h5>
+                                <h5>Role: {{employee.role}}</h5>
+                            </div>
                             <br>
                             <hr>
                             <br>
@@ -103,13 +108,13 @@
                                 <form class="form-control text-left" method="POST" action="/manage/employees/{{employee.id}}/edit/process">
                                     {% csrf_token %}
                                     <label for="first_name">first Name:</label>
-                                    <input class="form-control" type="text" name="first_name" placeholder="{{ employee.first_name }}" />
+                                    <input class="form-control" type="text" name="first_name" placeholder="First Name" />
                                     <br>
                                     <label for="last_name">Last Name:</label>
-                                    <input class="form-control" type="text" name="last_name" placeholder="{{ employee.last_name }}" />
+                                    <input class="form-control" type="text" name="last_name" placeholder="Last Name" />
                                     <br>
                                     <label for="role">Role:</label>
-                                    <input class="form-control" type="text" name="role" placeholder="{{ employee.role }}" />
+                                    <input class="form-control" type="text" name="role" placeholder="Role" />
                                     <br>
                                     <input type="submit" class="form-control btn btn-success" />
                                 </form>

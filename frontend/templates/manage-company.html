@@ -27,7 +27,6 @@
                 <div class="navbar-nav">
                     <a class="navbar-brand" href="#">{{ company.name }}</a>
                     <a class="nav-item nav-link active" href="/manage/admin">Management <span class="sr-only">(current)</span></a>
-                    <a class="nav-item nav-link" href="/clock">Clock</a>
                     <a class="nav-item nav-link" href="/settings">Settings</a>
                     <a class="nav-item nav-link" href="/logout">Logout</a>
                 </div>
@@ -113,7 +112,7 @@
                                     <label for="name">Name: </label>
                                     <input class="form-control" type="text" name="name" placeholder="{{ company.name }}" />
                                     <p class="mt-2"></p>
-                                    <label for="image">Logo: {{ company.image}} </label>
+                                    <label for="image">Logo: {{company.image}} </label>
                                     <input class="form-control" type="file" name="image" />
                                     <input type="hidden" name="company_id" value="{{ company.id }}" />
                                     <br>

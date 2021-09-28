@@ -12,7 +12,7 @@ class CompanyManager(models.Manager):
 
 class Company(models.Model):
     name=models.CharField(max_length=100, null=False, unique=True)
-    image=models.ImageField(null=True, upload_to="media/")
+    image=models.ImageField(null=True)
     # color=models.CharField(max_length=100, null=True)
     # font_color=models.CharField(max_length=100, null=True)
     created_at=models.DateTimeField(auto_now_add=True)
