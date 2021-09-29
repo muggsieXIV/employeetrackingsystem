@@ -3,6 +3,10 @@
     padding: 0px;
 }
 
+.spacer-text {
+    color: transparent;
+}
+
 .account-steps li {
     list-style-type: none;
     text-align: left;

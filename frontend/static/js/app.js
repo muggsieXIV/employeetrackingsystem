@@ -1,3 +1,4 @@
+
 const clock = document.querySelector('.clock');
 
 const time = () => {
@@ -6,6 +7,8 @@ const time = () => {
     const hours = dateFns.format(now, 'hh');
     const minutes = dateFns.format(now, 'mm');
     const seconds = dateFns.format(now, 'ss');
+
+
 
     const html = `
     <div class="date">${date}</div>

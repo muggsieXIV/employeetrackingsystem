@@ -28,8 +28,8 @@
             <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                 <div class="navbar-nav">
                     <a class="navbar-brand" href="#">{{ company.name }}</a>
-                    <a class="nav-item nav-link active" href="/manage/admin">Management <span class="sr-only">(current)</span></a>
-                    <a class="nav-item nav-link" href="/settings">Settings</a>
+                    <a class="nav-item nav-link" href="/manage/admin">Management <span class="sr-only">(current)</span></a>
+                    <a class="nav-item nav-link active" href="/settings">Settings</a>
                     <a class="nav-item nav-link" href="/logout">Logout</a>
                 </div>
             </div>
@@ -49,8 +49,8 @@
         <div class="row mt-50 ml-3">
             <!-- TAB LINKS -->
             <section class="admin-control col-sm-3 col-lg-2 tab">
-                <div class="container">
-                    <img src="{{ company.image.url }}" alt="{{ company.name }}" />
+                <div class="container mb-2">
+                    <img class="img-fluid" src="{{ company.image.url }}" alt="{{ company.name }}" />
                 </div>
                 <header>
                     <h6>Admin</h6>
@@ -97,7 +97,60 @@
                     <div class="col-sm-8 col-lg-8">
                         <h3>{{ company.name }} | Settings</h3>
                         <hr>
-                        <p>Settings manager coming soon</p>
+                        <p>Manage your company's settings</p>
+                        <p>For requests/suggestions of further customization capabilities <a href="mailto:benwillwalk@gmail.com">Contact Us</a>.</p>
+                        <hr>
+                        <h6>
+                            For color and font-color you may use a color name or the recommended <a href="https://htmlcolorcodes.com/" target="_blank">hexcodes</a> for branding needs.
+                        </h6>
+                        <h6>
+                            Note that Color Schemes are currently not available, but store your information now for when this feature is released.
+                        </h6>
+                        <h6>
+                            Color schemes control employee time clock. Admin schemes coming soon.
+                        </h6>
+                        <br>
+                        <form action="settings/process" class="form-group" method="POST">
+                            {% csrf_token %}
+                            <label for="color">Color</label>
+                            <input type="text" class="form-control" name="color" placeholder="{{ company_settings.color }}" />
+                            <br>
+                            <label for="font_color">Font Color</label>
+                            <input type="text" class="form-control" name="font_color" placeholder="{{ company_settings.font_color }}" />
+                            <br>
+                            <label for="background_color">Background Color</label>
+                            <input type="text" class="form-control" name="backgorund_color" placeholder="{{ company_settings.background_color }}" />
+                            <br>
+                            <label for="time_zone">Time Zone</label>
+                            <select name="time_zone" class="form-control" placeholder="US/Central">
+                                <option value="USTimeZone(-5, "Eastern",  "EST", "EDT")" name="time_zone">US/Eastern</option>
+                                <option selected="selected" value="USTimeZone(-6, "Central",  "CST", "CDT")" name="time_zone">US/Central</option>
+                                <option value="USTimeZone(-7, "Mountain", "MST", "MDT")" name="time_zone">US/Mountain</option>
+                                <option value="USTimeZone(-8, "Pacific",  "PST", "PDT")" name="time_zone">US/Pacific</option>
+                            </select>
+                            <br>
+                            <h6>Contact name and number will be used to display to your employees.</h6>
+                            <label for="contact_name">Contact Name</label>
+                            <input type="text" class="form-control" name="contact_name" placeholder="{{ company_settings.contact_name }}" />
+                            <br>
+                            <label for="contact_number">Contact Number</label>
+                            <input type="text" class="form-control" name="contact_number" placeholder="{{ company_settings.contact_number }}" />
+                            <br>
+                            <input type="submit" class="btn btn-success" name="submit" />
+                        </form>
+                        <hr>
+                        <div class="m-5">
+                            <h4>Delete Company</h4>
+                            <h6>
+                                Warning: This will be permanent and can not be undone. 
+                                We suggest you download/print all your reports or they 
+                                will be permanently lost. We will not be able to retreive
+                                any data after this process is completed. 
+                            </h6>
+                            <a href="/manage/admin/edit/process/delete" class="btn btn-danger">Delete Company</a>
+                        </div>
+                        <br>
+                        <h6 class="m-5">Let us know how we are doing! Send us an <a href="mailto:benwillwalk@gmail.com">email</a>.</h6>
                     </div>
                 </div>
             </section>

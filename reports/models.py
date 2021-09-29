@@ -35,6 +35,7 @@ class ClockSystem(models.Model):
     clocked_in_at=models.TimeField(null=False)
     clocked_out_at=models.TimeField(null=True)
     is_flagged=models.BooleanField(default=False)
+    flag_message=models.TimeField(null=True)
     objects=ClockSystemManager()
     created_at=models.DateTimeField(auto_now_add=True)
     updated_at=models.DateTimeField(auto_now=True)
@@ -43,6 +44,7 @@ class ClockSystem(models.Model):
         ordering = (
             'id',
             'is_flagged',
+            'flag_message',
             'employee',
             'date_in',
             'date_out',
@@ -56,5 +58,3 @@ class ClockSystem(models.Model):
             'created_at',
             'updated_at'
         )
-
-

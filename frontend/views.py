@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from users.models import Admin 
-from company.models import Company, Location
+from company.models import Company, CompanySetting, Location
 from employees.models import Employee
 from reports.models import ClockSystem
 import datetime
@@ -205,6 +205,7 @@ def dashboard(request):
     context = {
         'all_employees': Employee.objects.filter(company=company.id),
         'company': company,
+        'company_settings': CompanySetting.objects.get(company=company),
         'location': Location.objects.get(id=request.session['location_id'])
     }
 
@@ -226,19 +227,23 @@ def process_clock(request):
         return redirect('/dashboard')
 
     location = Location.objects.get(id=request.session['location_id'])
+    company = Company.objects.get(location=location)
+
+    company_settings = CompanySetting.objects.get(company=company)
 
     # Define the Employee
     e = Employee.objects.get(id=request.POST['employee'])
 
-    now = datetime.datetime.now(pytz.timezone('US/Central'))
+    now = datetime.datetime.now(pytz.timezone(company_settings.time_zone))
 
     # ===============
     # If Clocking In
     # ===============
     if request.POST['clocksys'] == "clockin":
         if e.is_active == True:
-            messages.error(request, 'failed: ' + e.last_name + ', ' + e.first_name  + ' is already clocked in')
-            return redirect('/dashboard')
+            messages.error(request, 'Failed: ' + e.first_name + ' ' + e.last_name + ' is already active.')
+            return redirect('/dashboard', messages)
+
         ClockSystem.objects.create(
             employee=e,
             location=location, 
@@ -255,7 +260,7 @@ def process_clock(request):
         messages.error(request, success_msg, extra_tags='success')
 
 
-        return redirect('/dashboard')
+        return redirect('/dashboard', messages)
 
     # ===============
     # if clocking out
@@ -263,24 +268,24 @@ def process_clock(request):
     if request.POST['clocksys'] == 'clockout':
         # Check to make sure the employee is clocked in, and has not clocked out
         if e.is_active != True:
-            messages.error(request, 'Failed: Employee ' + e.last_name + ', ' + e.first_name + ' is not clocked in.')
+            messages.error(request, 'Failed: ' + e.last_name + ', ' + e.first_name + ' is not clocked in. If you forgot to clock in today please include a message detailing what happened.')
             return redirect('/dashboard')
         # If employee was clocked in: 
         if e.is_active == True:
-            # Get the employee's last clockin
             cs = ClockSystem.objects.filter(location=request.session['location_id'])
             e_cs = cs.filter(employee=request.POST['employee'])
             last_login = e_cs[0]
             for clockins in e_cs:
                 if clockins.id > last_login.id:
                     last_login = clockins
-
+            
             # Calculate hours_worked
             last_login.clocked_out_at = now.strftime("%H:%M:%S")
             c_in = last_login.clocked_in_at
             c_out = last_login.clocked_out_at
             d_in = last_login.date_in
-            d_out = now.strftime("%Y-%m-%d")
+            d_out = now.strftime("%Y-%m-%d")# Get the employee's last clockin
+
 
             datetime1_str = str(d_in) + ' ' + str(c_in)
             datetime2_str = str(d_out) + ' ' + str(c_out)
@@ -487,9 +492,6 @@ def process_edit_company(request):
             messages.error(request, message)
         return redirect('/manage/company')
 
-    if not request.POST['image'] and not request.POST['name']:
-        return redirect('/manage/company')
-
     if not request.POST['name']:
         company.name = company.name
         company.image = request.POST['image']
@@ -498,7 +500,6 @@ def process_edit_company(request):
 
     if not request.POST['image']:
         company.name = request.POST['name']
-        company.image = company.image
         company.save()
         return redirect('/manage/company')
 
@@ -507,17 +508,6 @@ def process_edit_company(request):
         company.image = request.POST['image']
         company.save()
         return redirect('/manage/company')
-
-
-# Delete Company Process
-def process_company_delete(request):
-    if 'admin_id' not in request.session:
-        return redirect('/signin-company-admin')
-    company_to_delete = Company.objects.get(admins=request.session['admin_id'])
-
-    company_to_delete.delete()
-    request.session.flush()
-    return redirect('/signin-company-admin')
 
 # ============================
 # LOCATION VIEWS and FUNCTIONS
@@ -739,12 +729,48 @@ def settings(request):
         return redirect('/signin-company-admin')
     
     company = Company.objects.get(admins=request.session['admin_id'])
+    company_settings = CompanySetting.objects.filter(company=company)
+    if not company_settings:
+
+        company_settings = CompanySetting.objects.create(
+            company=Company.objects.get(admins=request.session['admin_id']),
+        )
+        company_settings.save()
+        return redirect('/settings')
 
     context = {
         'company': company, 
-        'locations': Location.objects.filter(company=company.id)
+        'locations': Location.objects.filter(company=company),
+        'company_settings': CompanySetting.objects.get(company=company)
     }
     return render(request, 'settings.html', context)
+
+def process_settings(request):
+    if 'admin_id' not in request.session:
+        return redirect('/signin-company-admin')
+    
+    company = Company.objects.get(admins=request.session['admin_id'])
+    company_settings = CompanySetting.objects.get(company=company)
+
+    company_settings.color = request.POST['color']
+    company_settings.font_color = request.POST['font_color']
+    company_settings.background_color = request.POST['background_color']
+    company_settings.time_zone = request.POST['time_zone']
+    company_settings.contact_name = request.POST['contact_name']
+    company_settings.contact_number = request.POST['contact_number']
+    company_settings.save()
+    
+    return redirect('/settings')
+
+# Delete Company Process
+def process_company_delete(request):
+    if 'admin_id' not in request.session:
+        return redirect('/signin-company-admin')
+    company_to_delete = Company.objects.get(admins=request.session['admin_id'])
+
+    company_to_delete.delete()
+    request.session.flush()
+    return redirect('/signin-company-admin')
 
 # =======
 # Logout
