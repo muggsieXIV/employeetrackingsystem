@@ -8,6 +8,7 @@ import datetime
 import bcrypt
 import pytz
 
+
 # =================
 # Create an Account
 # =================
@@ -190,6 +191,7 @@ def process_signin_location(request):
 
     return redirect('/dashboard')
 
+
 # ==============
 # Employee Views
 # ==============
@@ -333,6 +335,7 @@ def signout_location(request):
     request.session.flush()
     return redirect('/')
 
+
 # =========================
 # ADMIN VIEWS and FUNCTIONS
 # =========================
@@ -461,6 +464,7 @@ def process_admin_delete(request, admin_id):
     admin_to_delete.delete()
     return redirect('/manage/admin')
 
+
 # ===========================
 # COMPANY VIEWS and FUNCTIONS
 # ===========================
@@ -492,22 +496,12 @@ def process_edit_company(request):
             messages.error(request, message)
         return redirect('/manage/company')
 
-    if not request.POST['name']:
-        company.name = company.name
-        company.image = request.POST['image']
-        company.save()
-        return redirect('/manage/company')
+    company.name = request.POST['name']
+    company.image = request.FILES['image']
+    company.save()
 
-    if not request.POST['image']:
-        company.name = request.POST['name']
-        company.save()
-        return redirect('/manage/company')
+    return redirect('/manage/company')
 
-    if request.POST['name'] and request.POST['image']:
-        company.name = request.POST['name']
-        company.image = request.POST['image']
-        company.save()
-        return redirect('/manage/company')
 
 # ============================
 # LOCATION VIEWS and FUNCTIONS
@@ -622,6 +616,7 @@ def process_delete_location(request, location_id):
     location.delete()
 
     return redirect('/manage/locations')
+
 
 # ======================
 # Manage Employees View
@@ -772,10 +767,12 @@ def process_company_delete(request):
     request.session.flush()
     return redirect('/signin-company-admin')
 
+
 # =======
 # Logout
 # =======
 # (Works Globally)
+
 def logout(request):
     request.session.flush()
     return redirect('/')

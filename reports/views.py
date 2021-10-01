@@ -4,11 +4,13 @@ from django.contrib import messages
 from employees.models import Employee
 from .models import ClockSystem
 from company.models import Location, Company
-import datetime
+import datetime, time
 import pytz
 
 
-# ========= Locations ============
+# =================
+# Location Reports
+# =================
 
 # Full Report for a Location
 def single_location_report(request, location_id):
@@ -324,7 +326,9 @@ def process_location_totals_print(request, location_id):
     return render(request, 'report-location-all-totals-print.html', context)
 
 
-# ======== Employees =========== 
+# ==================
+# Employees Reports
+# ==================
 
 # Report View for All Employees
 # Page allows users to filter records for all employees or view individual employee reports
@@ -843,3 +847,93 @@ def process_employee_report_print(request, employee_id):
 
 
     return render(request, 'report-employee-print.html', context)
+
+
+# =====================
+# Edit/Delete Reports
+# =====================
+
+def edit_report(request, clockin_id):
+
+    if 'admin_id' not in request.session:
+        return redirect('/signin-company-admin')
+
+    company = Company.objects.get(admins=request.session['admin_id'])
+    clock_in = ClockSystem.objects.get(id=clockin_id)
+
+    context = {
+        'company': company,
+        'locations': Location.objects.filter(company=company),
+        'clock_in': clock_in,
+    }
+
+    return render(request, 'edit-report.html', context)
+
+def process_edit_report(request, clockin_id):
+    if 'admin_id' not in request.session:
+        return redirect('/signin-company-admin')
+    
+    company = Company.objects.get(admins=request.session['admin_id'])
+
+    context = {
+        'company': company,
+        'locations': Location.objects.filter(company=company),
+        'clock_in': ClockSystem.objects.get(id=request.POST['clockin_id'])
+    }
+    employee = context['clock_in'].employee
+    print(employee)
+    # find employee
+    all_employees = Employee.objects.filter(company=company)
+    for e in all_employees:
+        full_name = e.last_name + ', ' + e.first_name
+        if full_name == employee:
+            employee = e
+    print(employee.id)
+    clock_in = context['clock_in']
+    print(clock_in.employee)
+    clock_in.role = request.POST['role']
+    clock_in.date_in = request.POST['date_in']
+    clock_in.date_out = request.POST['date_out']
+    clock_in.clocked_in_at = request.POST['clocked_in_at']
+    clock_in.clocked_out_at = request.POST['clocked_out_at']
+    clock_in.in_comment = request.POST['in_comment']
+    clock_in.out_comment = request.POST['out_comment']
+    # Get the location
+    location = Location.objects.get(id=request.POST['location'])
+    clock_in.location = location
+    clock_in.flag_message = request.POST['flag_message']
+
+    if request.POST['is_flagged'] == "True":
+        clock_in.is_flagged = True
+    if request.POST['is_flagged'] == "False":
+        clock_in.is_flagged = False
+    
+    # Calculate hours_worked
+    c_in = clock_in.clocked_in_at
+    c_in += ':00'
+    c_out = clock_in.clocked_out_at
+    c_out += ':00'
+    d_in = clock_in.date_in
+    d_out = clock_in.date_out
+
+    datetime1_str = str(d_in) + ' ' + c_in
+    datetime2_str = str(d_out) + ' ' + c_out
+    datetime1_str = str(d_in) + ' ' + c_in
+    datetime2_str = str(d_out) + ' ' + c_out
+
+    datetimeFormat = '%Y-%m-%d %H:%M:%S'
+    diff = datetime.datetime.strptime(datetime2_str, datetimeFormat) - datetime.datetime.strptime(datetime1_str, datetimeFormat)
+
+    # Setting Time Worked
+    clock_in.time_worked = str(diff)
+
+    clock_in.save()
+
+    return redirect(employee_report, employee_id=employee.id)
+
+def process_delete_report(request):
+    pass
+
+def process_delete_multiple_reports(request):
+    pass 
+

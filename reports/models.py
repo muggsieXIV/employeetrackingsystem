@@ -35,7 +35,7 @@ class ClockSystem(models.Model):
     clocked_in_at=models.TimeField(null=False)
     clocked_out_at=models.TimeField(null=True)
     is_flagged=models.BooleanField(default=False)
-    flag_message=models.TimeField(null=True)
+    flag_message=models.TextField(null=True)
     objects=ClockSystemManager()
     created_at=models.DateTimeField(auto_now_add=True)
     updated_at=models.DateTimeField(auto_now=True)

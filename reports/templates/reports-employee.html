@@ -28,8 +28,8 @@
             <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                 <div class="navbar-nav">
                     <a class="navbar-brand" href="#">{{ company.name }}</a>
-                    <a class="nav-item nav-link" href="/manage/admin">Management <span class="sr-only">(current)</span></a>
-                    <a class="nav-item nav-link active" href="/settings">Settings</a>
+                    <a class="nav-item nav-link active" href="/manage/admin">Management <span class="sr-only">(current)</span></a>
+                    <a class="nav-item nav-link" href="/settings">Settings</a>
                     <a class="nav-item nav-link" href="/logout">Logout</a>
                 </div>
             </div>
@@ -148,6 +148,7 @@
                     <table class="table table-striped">
                         <thead>
                             <tr>
+                                <th scope="col">Edit/Delete</th>
                                 <th scope="col">Is Flagged</th>
                                 <th scope="col">Employee</th>
                                 <th scope="col">Date</th>
@@ -165,6 +166,9 @@
                         <tbody>
                             {% for data in rec %}
                                 <tr>
+                                    <th scope="row" class="table-data">
+                                        <a href="/reports/employee/clockin/{{ data.id }}/edit">Edit/Delete</a>
+                                    </th>
                                     <th scope="row" class="table-data">
                                         {% if data.is_flagged == True %}
                                             <i class="bi bi-flag-fill"></i>
