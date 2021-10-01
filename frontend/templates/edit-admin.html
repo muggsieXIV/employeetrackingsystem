@@ -19,7 +19,7 @@
         NAVIGATION SECTION
         ================== 
         -->
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark" id="navbar">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="navbar">
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -27,7 +27,6 @@
                 <div class="navbar-nav">
                     <a class="navbar-brand" href="#">{{ company.name }}</a>
                     <a class="nav-item nav-link active" href="/manage/admin">Management <span class="sr-only">(current)</span></a>
-                    <a class="nav-item nav-link" href="/clock">Clock</a>
                     <a class="nav-item nav-link" href="/settings">Settings</a>
                     <a class="nav-item nav-link" href="/logout">Logout</a>
                 </div>
@@ -40,6 +39,11 @@
         ====================== 
         -->
 
+        <div>
+            <h5 class="spacer-text mb-10">Employee Tracking System</h5>
+            <br>
+        </div>
+
         <!-- 
         ==================
         ADMIN NAVIGATION
@@ -48,8 +52,8 @@
         <div class="row mt-50 ml-3">
             <!-- TAB LINKS -->
             <section class="admin-control col-sm-3 col-lg-2 tab">
-                <div class="container">
-                    <img src="{{company.image.url}}" alt="{{ company.name }}" />
+                <div class="container mb-2">
+                    <img class="img-fluid" src="{{ company.image.url }}" alt="{{ company.name }}" />
                 </div>
                 <header>
                     <h6>Admin</h6>
@@ -67,12 +71,10 @@
                     <div><a href="/manage/locations">Locations</a></div>
                     <hr>
                     <div><a href="/manage/employees">Employees</a></div>
-                </ul>
                 <br>
                 <header>
                     <h6>Reports</h6>
                 </header>
-
                 {% if locations %}
                     {% for l in locations %}
                         <div><a href="/reports/locations/{{l.id}}" > {{ l.name }} </a></div>
@@ -87,7 +89,6 @@
                     <p>For issues please contact <a href="mailto:benwillwalk@gmail.com" class="">Customer Support</a> with a detailed summery of the issue.</p>
                 </div>
             </section>
-
             <!-- 
             ====================
             END ADMIN NAVIGATION

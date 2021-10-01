@@ -29,7 +29,6 @@
                 <div class="navbar-nav">
                     <a class="navbar-brand" href="#">{{ company.name }}</a>
                     <a class="nav-item nav-link active" href="/manage/admin">Management <span class="sr-only">(current)</span></a>
-                    <a class="nav-item nav-link" href="/clock">Clock</a>
                     <a class="nav-item nav-link" href="/settings">Settings</a>
                     <a class="nav-item nav-link" href="/logout">Logout</a>
                 </div>
@@ -50,8 +49,8 @@
         <div class="row mt-50 ml-3">
             <!-- TAB LINKS -->
             <section class="admin-control col-sm-3 col-lg-2 tab">
-                <div class="container">
-                    <img src="{{ company.image.url }}" alt="{{ company.name }}" />
+                <div class="container mb-2">
+                    <img class="img-fluid" src="{{ company.image.url }}" alt="{{ company.name }}" />
                 </div>
                 <header>
                     <h6>Admin</h6>

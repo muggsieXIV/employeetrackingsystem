@@ -19,6 +19,7 @@
             }, 1000);
         });
     </script>
+    <meta http-equiv="refresh" content="30">
 </head>
 <body>
     <div class="clock-page">
@@ -83,15 +84,16 @@
                     <div class="container pl-5 mt-5 text-center">
                         <div class="container text-center">
                             {% for message in messages %}
-                                <h4 class="text-center">{{ message }}</h4><br>
+                                <h4 class="text-center">{{ message }} <a href="/clockin/report-issue">Report Issue</a></h4>
+                                <br>
                             {% endfor %}
                         </div>
                     </div>
                 </div>
             {% endif %}
             <div>
-                <h5>If you have issues TEXT Amy Walker</h5>
-                <h5><a href="" class="">952-210-0831</h5>
+                <h5>If you have issues text {{ company_settings.contact_name }}</h5>
+                <h5><a href="" class="">{{ company_settings.contact_number }}</h5>
             </div>
             
         </div>

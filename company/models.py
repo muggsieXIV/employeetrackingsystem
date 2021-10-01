@@ -12,9 +12,7 @@ class CompanyManager(models.Manager):
 
 class Company(models.Model):
     name=models.CharField(max_length=100, null=False, unique=True)
-    image=models.ImageField(null=True, upload_to="media/")
-    # color=models.CharField(max_length=100, null=True)
-    # font_color=models.CharField(max_length=100, null=True)
+    image=models.ImageField(null=True, upload_to="company/")
     created_at=models.DateTimeField(auto_now_add=True)
     updated_at=models.DateTimeField(auto_now=True)
     objects = CompanyManager()
@@ -82,3 +80,31 @@ class Location(models.Model):
 
     def __str__(self):
         return self.name
+
+class CompanySetting(models.Model):
+    company=models.ForeignKey(Company, related_name="company_settings", on_delete=models.CASCADE)
+    color=models.CharField(max_length=100, null=True, default="#26225B")
+    font_color=models.CharField(max_length=100, null=True, default="#F8F8F8")
+    background_color=models.CharField(max_length=50, null=True, default="#F8F8F8")
+    time_zone=models.CharField(max_length=200, null=True, default="US/Central")
+    contact_name=models.CharField(max_length=50, null=True)
+    contact_number=models.CharField(max_length=14, null=True)
+    created_at=models.DateTimeField(auto_now_add=True)
+    updated_at=models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.company.name
+
+    class Meta:
+        ordering = (
+            'id',
+            'company',
+            'color',
+            'font_color',
+            'background_color',
+            'time_zone',
+            'contact_name',
+            'contact_number',
+            'created_at',
+            'updated_at'
+        )

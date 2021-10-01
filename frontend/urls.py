@@ -20,8 +20,6 @@ urlpatterns = [
     # Create Account (Admin) Process Forum
     path('create-account/admin/process', views.process_create_account_admin),
 
-
-
     # Sign In Admin Forum View
     path('signin-company-admin', views.signin_admin),
     # Sign In Admin Process Forum
@@ -33,10 +31,6 @@ urlpatterns = [
     path('', views.signin_location),
     # Sign In Location Process Forum
     path('process-signin-location', views.process_signin_location),
-
-
-
-
 
     # ==============================
     # ==== Location Paths ====
@@ -51,7 +45,7 @@ urlpatterns = [
     path('process-delete-clocksys/<int:clockSys_id>', views.process_remove_clocksys),
 
     path('admin-clock-view', views.admin_clock_view),
-    path('settings', views.settings),
+    
     path('logout', views.logout),
 
 
@@ -64,11 +58,13 @@ urlpatterns = [
 
     # Create Admin Forum View
     path('manage/admin/create', views.create_new_account_admin),
+
     # Create Admin Process Forum
     path('manage/admin/create_new/process', views.process_create_new_account_admin),
 
     # Edit Admin Forum View
     path(f'manage/admin/edit/<int:admin_id>', views.manage_admin_edit),
+
     # Edit Admin Process Forum
     path(f'manage/admin/edit/<int:admin_id>/process', views.process_admin_edit),
 
@@ -85,7 +81,7 @@ urlpatterns = [
     path('manage/company/edit', views.process_edit_company), 
 
     # Delete Company Process
-    path(f'manage/admin/edit/<int:company_id>/process/delete', views.process_company_delete),
+    path('manage/admin/edit/process/delete', views.process_company_delete),
 
 
     # =====================
@@ -130,5 +126,10 @@ urlpatterns = [
     path('manage/employees/<int:employee_id>/edit/process', views.process_edit_employees),
 
     # Delete Employee
-    path('manage/employees/<int:employee_id>/process/delete', views.process_delete_employee)
+    path('manage/employees/<int:employee_id>/process/delete', views.process_delete_employee),
+
+    # ======================
+    # Settings Manager View
+    # ======================
+    path('settings', views.settings)
 ]
