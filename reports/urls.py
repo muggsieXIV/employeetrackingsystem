@@ -23,7 +23,6 @@ urlpatterns = [
     # Edit/Delete
     path(f'employee/clockin/<int:clockin_id>/edit/', views.edit_report),
     path(f'employee/clockin/<int:clockin_id>/edit/process', views.process_edit_report),
-    path(f'employee/clockin/<int:clockin_id>/process_delete', views.process_delete_report),
-    path('clockins/delete/process', views.process_delete_multiple_reports)
+    path('clockins/delete/process', views.process_delete_report)
 
 ]

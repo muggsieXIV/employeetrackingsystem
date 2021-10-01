@@ -878,7 +878,7 @@ def process_edit_report(request, clockin_id):
     context = {
         'company': company,
         'locations': Location.objects.filter(company=company),
-        'clock_in': ClockSystem.objects.get(id=request.POST['clockin_id'])
+        'clock_in': ClockSystem.objects.get(id=clockin_id)
     }
     employee = context['clock_in'].employee
     print(employee)
@@ -932,7 +932,23 @@ def process_edit_report(request, clockin_id):
     return redirect(employee_report, employee_id=employee.id)
 
 def process_delete_report(request):
-    pass
+    if 'admin_id' not in request.session:
+        return redirect('/signin-company-admin')
+
+    company = Company.objects.get(admins=request.session['admin_id'])
+    
+    clocksys_to_delete = ClockSystem.objects.get(id=request.POST['clockin_id'])
+    all_employees = Employee.objects.filter(company=company)
+    employee = clocksys_to_delete.employee
+    print(employee)
+    for e in all_employees:
+        full_name = e.last_name + ', ' + e.first_name
+        if full_name == employee:
+            employee = e
+
+    clocksys_to_delete.delete()
+
+    return redirect(employee_report, employee_id=employee.id)
 
 def process_delete_multiple_reports(request):
     pass 
