@@ -248,7 +248,7 @@ def process_clock(request):
 
         ClockSystem.objects.create(
             employee=e,
-            location=location, 
+            location_in=location, 
             role=e.role,
             in_comment=request.POST['comment'], 
             date_in=now.strftime("%Y-%m-%d"),
@@ -274,9 +274,9 @@ def process_clock(request):
             return redirect('/dashboard')
         # If employee was clocked in: 
         if e.is_active == True:
-            cs = ClockSystem.objects.filter(location=request.session['location_id'])
+            cs = ClockSystem.objects.filter(employee=e)
             e_cs = cs.filter(employee=request.POST['employee'])
-            last_login = e_cs[0]
+            last_login = cs[0]
             for clockins in e_cs:
                 if clockins.id > last_login.id:
                     last_login = clockins
@@ -287,7 +287,6 @@ def process_clock(request):
             c_out = last_login.clocked_out_at
             d_in = last_login.date_in
             d_out = now.strftime("%Y-%m-%d")# Get the employee's last clockin
-
 
             datetime1_str = str(d_in) + ' ' + str(c_in)
             datetime2_str = str(d_out) + ' ' + str(c_out)
@@ -309,6 +308,8 @@ def process_clock(request):
             
             # Set employe to inactive
             e.is_active = False
+
+            last_login.location_out = location
 
             last_login.save()
 
