@@ -25,7 +25,8 @@ class ClockSystemManager(models.Manager):
 
 class ClockSystem(models.Model):
     employee=models.ForeignKey(Employee, related_name="clockin_employee", on_delete=models.CASCADE)
-    location=models.ForeignKey(Location, related_name="clockin_location", on_delete=models.CASCADE)
+    location_in=models.ForeignKey(Location, related_name="clockin_location", on_delete=models.CASCADE)
+    location_out=models.ForeignKey(Location, related_name="clockout_location", on_delete=models.CASCADE, null=True)
     role=models.CharField(max_length=80, null=True, default="None")
     time_worked=models.CharField(max_length=255, null=True, default="00:00:00")
     in_comment=models.TextField(null=True, default="None")
@@ -52,7 +53,8 @@ class ClockSystem(models.Model):
             'clocked_out_at',
             'time_worked',
             'role',
-            'location',
+            'location_in',
+            'location_out',
             'in_comment',
             'out_comment',
             'created_at',

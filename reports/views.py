@@ -7,6 +7,8 @@ from company.models import Location, Company
 import datetime, time
 import pytz
 
+import operator
+
 
 # =================
 # Location Reports
@@ -29,21 +31,21 @@ def single_location_report(request, location_id):
         'res': [],
         'rec': [],
     }
-
+    res = []
     now = datetime.datetime.now()
 
     employees = context['all_employees']
 
-    rec = context['rec']
-
     for employee in employees:
         qued = []
-        
         first_qued = ClockSystem.objects.filter(employee=employee.id)
         for data in first_qued:
-            if data.location == location:
+            if data.location_in == location and data.location_out == location:
                 qued.append(data)
-                rec.append(data)
+            if data.location_in != location and data.location_out == location:
+                qued.append(data)
+            if data.location_in == location and data.location_out != location:
+                qued.append(data)
 
         days_worked = str(len(qued))
 
@@ -59,7 +61,6 @@ def single_location_report(request, location_id):
                 time_list.append(str(diff))
             else:
                 time_list.append(data.time_worked)
-        
         total_secs = 0
         for tm in time_list:
             time_parts = [int(s) for s in tm.split(':')]
@@ -67,7 +68,6 @@ def single_location_report(request, location_id):
         total_secs, sec = divmod(total_secs, 60)
         hr, min = divmod(total_secs, 60)
         total_time_worked = "%d:%02d:%02d" % (hr, min, sec)
-
 
         # Exporting Employee data to frontend
         employee_data = {
@@ -79,13 +79,22 @@ def single_location_report(request, location_id):
             'total_time_worked': total_time_worked,
             'all_clock_ins': qued,
         }
-        context['res'].append(employee_data)
-    
+        res.append(employee_data)
+        context['res'] = res
+
     rec = []
-    csy_qued = ClockSystem.objects.filter(location=location_id)
-    for data in csy_qued:
-        rec.append(data)
+    for employee in employees:
+        quick_que = ClockSystem.objects.filter(employee=employee.id)
+        for data in quick_que:
+            if data.location_in == location and data.location_out == location:
+                rec.append(data)
+            if data.location_in != location and data.location_out == location:
+                rec.append(data)
+            if data.location_in == location and data.location_out != location:
+                rec.append(data)
+
     rec.reverse()
+
     context['rec'] = rec
 
     return render(request, 'location-report.html', context)
@@ -107,38 +116,40 @@ def process_single_location_report(request, location_id):
         'res': [],
         'rec': []
     }
-
+    location = context['location']
+    employees = context['all_employees']
     start_date = str(context['start_date'])
     end_date = str(context['end_date'])
-    qued = []
     rec = []
     res = []
     
-    # Getting All Location Records for Date Range 
-    loc_rec = ClockSystem.objects.filter(location=location_id).order_by('created_at')
-
-    for data in loc_rec:
-        if data.location == context['location']:
-            qued.append(data)
-
+    # Filtering All Locations Records for Date Range 
+    for employee in employees:
+        qued = []
+        first_qued = ClockSystem.objects.filter(employee=employee.id)
+        for data in first_qued:
+            if data.location_in == location and data.location_out == location:
+                qued.append(data)
+            if data.location_in != location and data.location_out == location:
+                qued.append(data)
+            if data.location_in == location and data.location_out != location:
+                qued.append(data)
     # Setting the Records for start_date to end_date
-    for data in qued:
-        # setting string dates to datetime for evaluation
-        s = datetime.datetime.strptime(start_date, "%Y-%m-%d")
-        e = datetime.datetime.strptime(end_date, "%Y-%m-%d")
-        d_in = str(data.date_in)
-        eval = datetime.datetime.strptime(d_in, "%Y-%m-%d")
-        # evaluating our dates - if in range add to clock_ins
-        if s <= eval:
-            if eval <= e:
-                rec.append(data)
+        for data in qued:
+            # setting string dates to datetime for evaluation
+            s = datetime.datetime.strptime(start_date, "%Y-%m-%d")
+            e = datetime.datetime.strptime(end_date, "%Y-%m-%d")
+            d_in = str(data.date_in)
+            eval = datetime.datetime.strptime(d_in, "%Y-%m-%d")
+            # evaluating our dates - if in range add to clock_ins
+            if s <= eval:
+                if eval <= e:
+                    rec.append(data)
 
-    rec.reverse()
     context['rec'] = rec 
 
     # Generate employee totals
     for employee in context['all_employees']:
-
         employee_qued = []
         for data in rec:
             if data.employee == employee: 
@@ -197,37 +208,38 @@ def process_location_records_print(request, location_id):
         'all_employees': Employee.objects.filter(company=company.id),
         'start_date': request.POST['start_date'],
         'end_date': request.POST['end_date'],
-        'res': [],
         'rec': []
     }
 
     start_date = str(context['start_date'])
     end_date = str(context['end_date'])
-    qued = []
     rec = []
-    res = []
-    
-    # Getting All Location Records for Date Range 
-    loc_rec = ClockSystem.objects.filter(location=location_id).order_by('created_at')
+    employees = context['all_employees']
+    location = context['location']
 
-    for data in loc_rec:
-        if data.location == context['location']:
-            qued.append(data)
-
+    # Filtering All Locations Records for Date Range 
+    for employee in employees:
+        qued = []
+        first_qued = ClockSystem.objects.filter(employee=employee.id)
+        for data in first_qued:
+            if data.location_in == location and data.location_out == location:
+                qued.append(data)
+            if data.location_in != location and data.location_out == location:
+                qued.append(data)
+            if data.location_in == location and data.location_out != location:
+                qued.append(data)
     # Setting the Records for start_date to end_date
-    for data in qued:
-        # setting string dates to datetime for evaluation
-        s = datetime.datetime.strptime(start_date, "%Y-%m-%d")
-        e = datetime.datetime.strptime(end_date, "%Y-%m-%d")
-        d_in = str(data.date_in)
-        eval = datetime.datetime.strptime(d_in, "%Y-%m-%d")
+        for data in qued:
+            # setting string dates to datetime for evaluation
+            s = datetime.datetime.strptime(start_date, "%Y-%m-%d")
+            e = datetime.datetime.strptime(end_date, "%Y-%m-%d")
+            d_in = str(data.date_in)
+            eval = datetime.datetime.strptime(d_in, "%Y-%m-%d")
+            # evaluating our dates - if in range add to clock_ins
+            if s <= eval:
+                if eval <= e:
+                    rec.append(data)
 
-        # evaluating our dates - if in range add to clock_ins
-        if s <= eval:
-            if eval <= e:
-                rec.append(data)
-            
-    rec.reverse()
     context['rec'] = rec 
 
     return render(request, 'report-location-all-records-print.html', context)
@@ -249,38 +261,40 @@ def process_location_totals_print(request, location_id):
         'res': [],
         'rec': []
     }
-
+    location = context['location']
+    employees = context['all_employees']
     start_date = str(context['start_date'])
     end_date = str(context['end_date'])
-    qued = []
     rec = []
     res = []
     
-    # Getting All Location Records for Date Range 
-    loc_rec = ClockSystem.objects.filter(location=location_id).order_by('created_at')
-
-    for data in loc_rec:
-        if data.location == context['location']:
-            qued.append(data)
-
+    # Filtering All Locations Records for Date Range 
+    for employee in employees:
+        qued = []
+        first_qued = ClockSystem.objects.filter(employee=employee.id)
+        for data in first_qued:
+            if data.location_in == location and data.location_out == location:
+                qued.append(data)
+            if data.location_in != location and data.location_out == location:
+                qued.append(data)
+            if data.location_in == location and data.location_out != location:
+                qued.append(data)
     # Setting the Records for start_date to end_date
-    for data in qued:
-        # setting string dates to datetime for evaluation
-        s = datetime.datetime.strptime(start_date, "%Y-%m-%d")
-        e = datetime.datetime.strptime(end_date, "%Y-%m-%d")
-        d_in = str(data.date_in)
-        eval = datetime.datetime.strptime(d_in, "%Y-%m-%d")
-        # evaluating our dates - if in range add to clock_ins
-        if s <= eval:
-            if eval <= e:
-                rec.append(data)
+        for data in qued:
+            # setting string dates to datetime for evaluation
+            s = datetime.datetime.strptime(start_date, "%Y-%m-%d")
+            e = datetime.datetime.strptime(end_date, "%Y-%m-%d")
+            d_in = str(data.date_in)
+            eval = datetime.datetime.strptime(d_in, "%Y-%m-%d")
+            # evaluating our dates - if in range add to clock_ins
+            if s <= eval:
+                if eval <= e:
+                    rec.append(data)
 
-    rec.reverse()
     context['rec'] = rec 
 
     # Generate employee totals
     for employee in context['all_employees']:
-
         employee_qued = []
         for data in rec:
             if data.employee == employee: 
@@ -401,10 +415,12 @@ def process_all_employees_report(request):
                         'time_worked': data.time_worked,
                         'in_comment': data.in_comment,
                         'out_comment': data.out_comment,
-                        'location': data.location,
+                        'location_in': data.location_in,
+                        'location_out': data.location_out,
                         'role': data.role
                     }
                     rec.append(record)
+
         days_worked = str(len(clock_ins))
         now = datetime.datetime.now(pytz.timezone('US/Central'))
         time_list = []
@@ -438,7 +454,7 @@ def process_all_employees_report(request):
 
         context['res'].append(employee_data) 
         context['rec'] = rec
-        context['rec'].reverse
+        context['rec'].reverse()
 
 
 
@@ -496,7 +512,8 @@ def process_employees_all_totals_print(request):
                         'time_worked': data.time_worked,
                         'in_comment': data.in_comment,
                         'out_comment': data.out_comment,
-                        'location': data.location,
+                        'location_in': data.location_in,
+                        'location_out': data.location_out,
                         'role': data.role,
                     }
                     rec.append(record)
@@ -534,7 +551,7 @@ def process_employees_all_totals_print(request):
 
         context['res'].append(employee_data) 
         context['rec'] = rec
-        context['rec'].reverse
+        context['rec'].reverse()
 
     return render(request, 'report-employees-all-totals-print.html', context)
 
@@ -590,7 +607,8 @@ def process_employees_all__records_print(request):
                         'time_worked': data.time_worked,
                         'in_comment': data.in_comment,
                         'out_comment': data.out_comment,
-                        'location': data.location,
+                        'location_in': data.location_in,
+                        'location_out': data.location_out,
                         'role': data.role,
                     }
                     rec.append(record)
@@ -899,8 +917,10 @@ def process_edit_report(request, clockin_id):
     clock_in.in_comment = request.POST['in_comment']
     clock_in.out_comment = request.POST['out_comment']
     # Get the location
-    location = Location.objects.get(id=request.POST['location'])
-    clock_in.location = location
+    location_in = Location.objects.get(id=request.POST['location_in'])
+    location_out = Location.objects.get(id=request.POST['location_out'])
+    clock_in.location_in = location_in
+    clock_in.location_out = location_out
     clock_in.flag_message = request.POST['flag_message']
 
     if request.POST['is_flagged'] == "True":

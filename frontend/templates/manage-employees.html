@@ -50,44 +50,46 @@
         ADMIN NAVIGATION
         ================== 
         -->
-        <div class="row mt-50 ml-3">
+        <div class="row mt-50 ml-2">
             <!-- TAB LINKS -->
-            <section class="admin-control col-sm-3 col-lg-2 tab">
-                <div class="container mb-2">
-                    <img class="img-fluid" src="{{ company.image.url }}" alt="{{ company.name }}" />
-                </div>
-                <header>
-                    <h6>Admin</h6>
-                </header>
-                <div>
-                    <a href="/manage/admin">Admins</a>
-                </div>
-                <hr>
-                <br>
-                <header>
-                    <h6>Company</h6>
-                </header>
-                    <div><a href="/manage/company">Company<a></div>
+            <section class="col-sm-3 col-lg-2">
+                <div class="admin-control tab">
+                    <div class="mb-2 text-center">
+                        <img class="img-fluid" src="{{ company.image.url }}" alt="{{ company.name }}" />
+                    </div>
+                    <header>
+                        <h6>Admin</h6>
+                    </header>
+                    <div>
+                        <a href="/manage/admin">Admins</a>
+                    </div>
                     <hr>
-                    <div><a href="/manage/locations">Locations</a></div>
-                    <hr>
-                    <div><a href="/manage/employees">Employees</a></div>
-                <br>
-                <header>
-                    <h6>Reports</h6>
-                </header>
-                {% if locations %}
-                    {% for l in locations %}
-                        <div><a href="/reports/locations/{{l.id}}" > {{ l.name }} </a></div>
+                    <br>
+                    <header>
+                        <h6>Company</h6>
+                    </header>
+                        <div><a href="/manage/company">Company<a></div>
                         <hr>
-                    {% endfor %}
-                {% endif %}
-                <div><a href="/reports/all-employees">Employee Reports</a></div>
-                <br>
-                <hr>
-                <br>
-                <div class="support-comment">
-                    <p>For issues please contact <a href="mailto:benwillwalk@gmail.com" class="">Customer Support</a> with a detailed summery of the issue.</p>
+                        <div><a href="/manage/locations">Locations</a></div>
+                        <hr>
+                        <div><a href="/manage/employees">Employees</a></div>
+                    <br>
+                    <header>
+                        <h6>Reports</h6>
+                    </header>
+                    {% if locations %}
+                        {% for l in locations %}
+                            <div><a href="/reports/locations/{{l.id}}" > {{ l.name }} </a></div>
+                            <hr>
+                        {% endfor %}
+                    {% endif %}
+                    <div><a href="/reports/all-employees">Employee Reports</a></div>
+                    <br>
+                    <hr>
+                    <br>
+                    <div class="support-comment">
+                        <p>For issues please contact <a href="mailto:benwillwalk@gmail.com" class="">Customer Support</a> with a detailed summery of the issue.</p>
+                    </div>
                 </div>
             </section>
             <!-- 
