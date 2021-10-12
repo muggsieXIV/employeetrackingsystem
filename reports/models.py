@@ -10,17 +10,17 @@ class ClockSystemManager(models.Manager):
     def clockSystem_validator(self, form_data):
         errors = {}
         if len(form_data['employee']) <= 0:
-            errors['employee'] = "No employee was selected, try again"
+            errors['employee'] = "Failed: No employee was selected, try again"
         return errors
     def clockin_validator(self, form_data):
         errors = {}
         if len(form_data['comment']) == 1:
-            errors['comment'] = "Please be descriptive if there is an issue."
+            errors['comment'] = "Failed: Please be descriptive with your comment if there is an issue."
         return errors
     def clockout_validator(self, form_data):
         errors = {}
         if len(form_data['comment']) == 1:
-            errors['comment'] = "Please be descriptive if there is an issue."
+            errors['comment'] = "Failed: Please be descriptive if there is an issue."
         return errors
 
 class ClockSystem(models.Model):

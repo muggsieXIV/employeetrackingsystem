@@ -170,24 +170,23 @@ def process_signin_location(request):
             messages.error(request, message)
         return redirect('/', messages)
     
-    location = Location.objects.get(username=request.POST['username'])
-    print(location)
+    location = Location.objects.filter(username=request.POST['username'])
 
     if not location:  # if user does NOT exist
-            messages.error(request, "Invalid username, try again!", extra_tags='username')
-            return redirect('/')
+        messages.error(request, "Invalid username, try again!", extra_tags='username')
+        return redirect('/')
 
     # at this point, all checks pass and we can now unhash the password
     # unhash password with Bcrypt - need to import above
     login_raw_pw = request.POST['password']
-
+    location_obj = Location.objects.get(username=request.POST['username'])
     # checks if the entered password does not match the one in the database
-    if not bcrypt.checkpw(login_raw_pw.encode(), location.password.encode()):
+    if not bcrypt.checkpw(login_raw_pw.encode(), location_obj.password.encode()):
         messages.error(request, "Invalid password, try again!", extra_tags='password')
         return redirect('/')
 
     # place the user ID into session - set to the last user created:
-    request.session['location_id'] = location.id
+    request.session['location_id'] = location_obj.id
 
     return redirect('/dashboard')
 
@@ -221,12 +220,13 @@ def process_clock(request):
     errors = ClockSystem.objects.clockin_validator(request.POST)
     if len(errors) > 0:
         for message in errors.values():
-            message.errors(request, message)
-        return redirect('/dashboard')
+            messages.error(request, message)
+        return redirect('/dashboard', messages)
 
     if 'employee' not in request.POST:
-        messages.error(request, 'Must choose an employee!')
-        return redirect('/dashboard')
+        messages.error(request, 'Failed: Must choose an employee!')
+        return redirect('/dashboard', messages)
+
 
     location = Location.objects.get(id=request.session['location_id'])
     company = Company.objects.get(location=location)
@@ -245,6 +245,10 @@ def process_clock(request):
         if e.is_active == True:
             messages.error(request, 'Failed: ' + e.first_name + ' ' + e.last_name + ' is already active.')
             return redirect('/dashboard', messages)
+        
+        is_flagged = False
+        if len(request.POST['comment']) > 0:
+            is_flagged = True
 
         ClockSystem.objects.create(
             employee=e,
@@ -252,16 +256,13 @@ def process_clock(request):
             role=e.role,
             in_comment=request.POST['comment'], 
             date_in=now.strftime("%Y-%m-%d"),
-            clocked_in_at=now.strftime("%H:%M:%S")
+            clocked_in_at=now.strftime("%H:%M:%S"),
+            is_flagged=is_flagged
         )
         e.is_active = True
-
         e.save()
-
-        success_msg = e.last_name + ', ' + e.first_name + ' successfully signed in at ' + str(now.strftime("%I:%M:%S%p"))
+        success_msg = 'Success: ' + e.last_name + ', ' + e.first_name + ' successfully signed in at ' + str(now.strftime("%I:%M:%S%p"))
         messages.error(request, success_msg, extra_tags='success')
-
-
         return redirect('/dashboard', messages)
 
     # ===============
@@ -271,7 +272,7 @@ def process_clock(request):
         # Check to make sure the employee is clocked in, and has not clocked out
         if e.is_active != True:
             messages.error(request, 'Failed: ' + e.last_name + ', ' + e.first_name + ' is not clocked in. If you forgot to clock in today please include a message detailing what happened.')
-            return redirect('/dashboard')
+            return redirect('/dashboard', messages)
         # If employee was clocked in: 
         if e.is_active == True:
             cs = ClockSystem.objects.filter(employee=e)
@@ -309,6 +310,9 @@ def process_clock(request):
             # Set employe to inactive
             e.is_active = False
 
+            if len(request.POST['comment']) > 0:
+                last_login.is_flagged = True
+
             last_login.location_out = location
 
             last_login.save()
@@ -318,11 +322,11 @@ def process_clock(request):
             success_msg = e.last_name + ', ' + e.first_name + ' successfully signed out at ' + str(now.strftime("%I:%M:%S%p"))
             messages.error(request, success_msg, extra_tags='success')
 
-            return redirect('/dashboard')
+            return redirect('/dashboard', messages)
             
     else:
         messages.error(request, 'Something went wrong. Please contact your admninistrator with code:303-B_FAIL')
-        return(redirect('/dashboard'))
+        return(redirect('/dashboard'), messages)
 
 # Deletng clockSystem Data
 def process_remove_clocksys(request, clockSys_id):
@@ -355,7 +359,6 @@ def manage_admin(request):
         'locations': Location.objects.filter(company=company.id)
     }
     
-
     return render(request, 'manage-admins.html', context)
 
 # Create Admin Forum View
@@ -777,3 +780,10 @@ def process_company_delete(request):
 def logout(request):
     request.session.flush()
     return redirect('/')
+
+
+# ============
+# ETS Views
+# ============
+def about(request):
+    return render(request, 'about.html')
