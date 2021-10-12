@@ -32,7 +32,7 @@ def single_location_report(request, location_id):
         'rec': [],
     }
     res = []
-    now = datetime.datetime.now()
+    now = datetime.datetime.now(pytz.timezone('US/Central'))
 
     employees = context['all_employees']
 
@@ -103,7 +103,7 @@ def single_location_report(request, location_id):
 def process_single_location_report(request, location_id):
     if 'admin_id' not in request.session:
         return redirect('/signin-company-admin')
-    
+
     company = Company.objects.get(admins=request.session['admin_id'])
 
     context = {
@@ -122,6 +122,8 @@ def process_single_location_report(request, location_id):
     end_date = str(context['end_date'])
     rec = []
     res = []
+
+    now = datetime.datetime.now(pytz.timezone('US/Central'))
     
     # Filtering All Locations Records for Date Range 
     for employee in employees:
@@ -158,7 +160,6 @@ def process_single_location_report(request, location_id):
         days_worked = str(len(employee_qued))
 
         # Getting Time Worked 
-        now = datetime.datetime.now(pytz.timezone('US/Central'))
         time_list = []
         for data in employee_qued:
             if not data.date_out:
@@ -178,7 +179,7 @@ def process_single_location_report(request, location_id):
         total_secs, sec = divmod(total_secs, 60)
         hr, min = divmod(total_secs, 60)
         total_time_worked = "%d:%02d:%02d" % (hr, min, sec)
-    
+
         employee_data = {
             'id': employee.id, 
             'last_name': employee.last_name, 
@@ -867,9 +868,9 @@ def process_employee_report_print(request, employee_id):
     return render(request, 'report-employee-print.html', context)
 
 
-# =====================
+# ====================
 # Edit/Delete Reports
-# =====================
+# ====================
 
 def edit_report(request, clockin_id):
 

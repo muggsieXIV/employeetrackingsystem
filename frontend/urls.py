@@ -128,8 +128,14 @@ urlpatterns = [
     # Delete Employee
     path('manage/employees/<int:employee_id>/process/delete', views.process_delete_employee),
 
+
     # ======================
     # Settings Manager View
     # ======================
-    path('settings', views.settings)
+    path('settings', views.settings),
+
+    # ==========
+    # ETS Views 
+    # ==========
+    path('about', views.about)
 ]
